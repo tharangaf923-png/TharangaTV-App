@@ -10,14 +10,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      - name: Create WebView App
+      - name: Build APK
         run: |
           mkdir -p app/src/main/java/com/tharangatv/app
           cat > app/build.gradle << 'EOF'
           plugins { id 'com.android.application' }
           android {
+            namespace 'com.tharangatv.app'
             compileSdk 34
             defaultConfig {
               applicationId "com.tharangatv.app"
@@ -68,13 +67,11 @@ jobs:
           }
           EOF
           echo "include ':app'" > settings.gradle
-          echo "plugins { id 'com.android.application' version '8.1.0' apply false }" > build.gradle
-          echo -e "org.gradle.jvmargs=-Xmx2048m\nandroid.useAndroidX=true" > gradle.properties
-      - name: Build with Gradle
-        run: |
-          wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip
-          unzip -q gradle-8.2-bin.zip
-          ./gradle-8.2/bin/gradle assembleDebug
+          echo "plugins { id 'com.android.application' version '8.4.0' apply false }" > build.gradle
+          echo "org.gradle.jvmargs=-Xmx2048m" > gradle.properties
+          wget -q https://services.gradle.org/distributions/gradle-8.6-bin.zip
+          unzip -q gradle-8.6-bin.zip
+          ./gradle-8.6/bin/gradle assembleDebug --no-daemon
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
